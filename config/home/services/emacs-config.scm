@@ -1,23 +1,22 @@
-(define-module (config home services emacs-config) ; Parentheses around module name are standard
+(define-module (config home services emacs-config)
   #:use-module (gnu home services)
-  #:use-module (gnu home services emacs)
-  #:use-module (gnu services)           ; Needed for the 'service' form
-  #:use-module (guix gexp)              ; (guix gexp), not (gnu gexp)
-  #:use-module (gnu packages emacs)     ; Needed for 'emacs' package
-  #:use-module (gnu packages emacs-xyz) ; Needed for 'emacs-evil'
-  #:export (emacs-config-services))
+  #:use-module (gnu packages emacs)     ; For the 'emacs' package variable
+  #:use-module (gnu packages emacs-xyz) ; For extensions like 'emacs-evil'
+  #:use-module (guix gexp)
+  #:export (emacs-config-service))
 
-(define emacs-config-services
+(define emacs-config-service
   (list
-   ;; Service 1: Place your file as 'manual-init.el' to avoid conflict
-   (service home-xdg-configuration-files-service-type
-            `(("emacs/custom-init.el" ,(local-file "./../files/init.el"))))
+   ;; 1. Install Emacs and plugins
+   ;; We use 'simple-service' to add packages to your profile automatically.
+   (simple-service 'emacs-packages
+                   home-profile-service-type
+                   (list emacs
+                         emacs-evil))
 
-   ;; Service 2: The Guix Emacs Service
-   (service home-emacs-service-type
-            (home-emacs-configuration
-             (package emacs)
-             (elisp-packages (list emacs-evil))
-             (init-el
-              ;; Load the separate file we defined above
-              `((load (expand-file-name "custom-init.el" user-emacs-directory))))))))
+   ;; 2. Configure init.el
+   ;; This links your local file to ~/.config/emacs/init.el
+   (simple-service 'emacs-config
+                   home-xdg-configuration-files-service-type
+                   `(("emacs/init.el" ,(local-file "../files/init.el"))))
+   ))
