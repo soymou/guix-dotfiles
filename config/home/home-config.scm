@@ -11,16 +11,14 @@
   #:use-module (gnu packages pdf)
   #:use-module (nongnu packages game-client)
   #:use-module (config home services emacs-config)
-  ;; iNiR core service (GUIX compatibility patches only)
   #:use-module (soymou services niri-config-service)
-  ;; Personal configuration services
   #:use-module (soymou services niri-startup-service)
   #:use-module (soymou services shell-config-service)
   #:use-module (soymou services gtk-theme-service)
   #:use-module (soymou services flatpak-service))
 
 (home-environment
-  (packages (list htop git flatpak node python zathura steam-nvidia))
+  (packages (list htop git flatpak node python zathura zathura-pdf-poppler steam-nvidia))
   (services
     (append
      (list (service home-bash-service-type
@@ -66,4 +64,4 @@
         ;; Audio effects for iNiR quick settings
         "com.github.wwmm.easyeffects"
         ;; Music recognition (Shazam-like) for iNiR
-        "com.github.marinm.songrec")))))
+        "re.fossplant.songrec")))))
