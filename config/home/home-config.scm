@@ -8,12 +8,14 @@
   #:use-module (gnu packages version-control)
   #:use-module (gnu packages node)
   #:use-module (gnu packages python)
+  #:use-module (gnu packages pdf)
+  #:use-module (nongnu packages game-client)
   #:use-module (config home services emacs-config)
   #:use-module (config home services niri-config)
   #:use-module (config home services flatpak))
 
 (home-environment
-  (packages (list htop git flatpak node python))
+  (packages (list htop git flatpak node python zathura steam-nvidia))
   (services
     (append
      (list (service home-bash-service-type
