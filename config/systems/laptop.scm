@@ -57,7 +57,7 @@
                          (type "ext4")) %base-file-systems)))
   )
 
-((nonguix-transformation-nvidia #:configure-xorg? #t) laptop-os)
+((nonguix-transformation-nvidia #:open-source-kernel-module? #t) laptop-os)
 
 
 

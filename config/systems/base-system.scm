@@ -1,5 +1,7 @@
 (define-module (config systems base-system)
   #:use-module (gnu)
+  #:use-module (gnu packages fonts)
+  #:use-module (gnu packages wm)
   #:use-module (guix)
   #:use-module (nongnu packages linux)
   #:use-module (nongnu system linux-initrd)
@@ -39,7 +41,20 @@
                                   'ext4))
                          (type "ext4")) %base-file-systems))
 
-    (packages (append (list (specification->package "gnome"))
+    (packages (append (list (specification->package "gnome")
+                            ;; Window managers
+                            niri
+                            ;; Fonts
+                            font-fira-code
+                            font-fira-mono
+                            font-jetbrains-mono
+                            font-hack
+                            font-iosevka
+                            font-iosevka-term
+                            font-liberation
+                            font-dejavu
+                            font-google-noto
+                            font-google-noto-emoji)
 		      %base-packages))
 
     (services 
