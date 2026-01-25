@@ -11,8 +11,13 @@
   #:use-module (gnu packages pdf)
   #:use-module (nongnu packages game-client)
   #:use-module (config home services emacs-config)
-  #:use-module (config home services niri-config)
-  #:use-module (config home services flatpak))
+  ;; iNiR core service (GUIX compatibility patches only)
+  #:use-module (soymou services niri-config-service)
+  ;; Personal configuration services
+  #:use-module (soymou services niri-startup-service)
+  #:use-module (soymou services shell-config-service)
+  #:use-module (soymou services gtk-theme-service)
+  #:use-module (soymou services flatpak-service))
 
 (home-environment
   (packages (list htop git flatpak node python zathura steam-nvidia))
@@ -21,16 +26,44 @@
      (list (service home-bash-service-type
                     (home-bash-configuration
                      (environment-variables
-                      '(("PATH" . "$HOME/.npm-global/bin:$PATH")
-                        ("QML_IMPORT_PATH" . "/home/mou/.guix-home/profile/lib/qt6/qml")
-                        ("QML2_IMPORT_PATH" . "/home/mou/.guix-home/profile/lib/qt6/qml")
-                        ("PYTHONPATH" . "/home/mou/.guix-home/profile/lib/python3.11/site-packages"))))))
-     emacs-config-service
-     ;; Niri config from local folder
-     niri-config-service
+                      '(;; NPM global bin path
+                        ("PATH" . "$HOME/.npm-global/bin:$PATH")
 
-     (simple-flatpak-service
+                        ;; Qt/QML paths for quickshell (use $HOME instead of hardcoded path)
+                        ("QML_IMPORT_PATH" . "$HOME/.guix-home/profile/lib/qt6/qml")
+                        ("QML2_IMPORT_PATH" . "$HOME/.guix-home/profile/lib/qt6/qml")
+
+                        ;; Python site-packages for GUIX profile
+                        ("PYTHONPATH" . "$HOME/.guix-home/profile/lib/python3.11/site-packages")
+
+                        ;; XDG_DATA_DIRS for icons and applications (GUIX profile paths)
+                        ;; This fixes missing icons in quickshell dock and app launcher
+                        ("XDG_DATA_DIRS" . "$HOME/.guix-home/profile/share:$HOME/.guix-profile/share:/run/current-system/profile/share:$XDG_DATA_DIRS"))))))
+
+     ;; Emacs configuration
+     emacs-config-service
+
+     ;; iNiR core (GUIX compatibility patches, packages, fonts)
+     ;; Note: This does NOT install niri config.kdl - use niri-startup-service for that
+     (niri-config-from-git
+       #:repo-url "https://github.com/soymou/iNiR"
+       #:repo-commit "main")
+
+     ;; Personal niri startup (pipewire, wireplumber, ii-setup, quickshell)
+     niri-startup-service
+
+     ;; Personal shell configs (foot, fish, starship)
+     shell-config-service
+
+     ;; Personal GTK theming (Material You via matugen)
+     gtk-theme-service
+
+     ;; Flatpak applications
+     (flatpak-service
       '("app.zen_browser.zen"
         "com.spotify.Client"
         "com.discordapp.Discord"
-        "com.mitchellh.ghostty")))))
+        ;; Audio effects for iNiR quick settings
+        "com.github.wwmm.easyeffects"
+        ;; Music recognition (Shazam-like) for iNiR
+        "com.github.marinm.songrec")))))
